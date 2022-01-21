@@ -80,7 +80,7 @@ int vswitch_connect(vswitch_t *lib,
 int vswitch_get_destnode_index_by_macaddr(vswitch_t *lib,
                                           struct ether_addr *mac)
 {
-    for (int i = 0; i < VSWITCH_NUM_NODES; i++) {
+    for (int i = 0; i < lib->n_connected; i++) {
         if (mac802_addr_eq((void *)&lib->nodes[i].addr, mac)) {
             return i;
         }
