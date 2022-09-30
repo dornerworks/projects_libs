@@ -56,6 +56,8 @@ typedef struct virtqueue_ring_object {
 /* A device-side virtqueue */
 typedef struct virtqueue_device {
     void (*notify)(void);       /* Notify function to wake-up driver side */
+    int (*lock)(void);          /* Function to lock virtqueue */
+    int (*unlock)(void);        /* Function to unlock virtqueue */
     void *cookie;               /* User-defined cookie */
 
     unsigned queue_len;         /* The number of entries in rings and descriptor table */
@@ -69,6 +71,8 @@ typedef struct virtqueue_device {
 /* A driver-side virtqueue */
 typedef struct virtqueue_driver {
     void (*notify)(void);       /* Notify function to wake-up device side */
+    int (*lock)(void);          /* Function to lock virtqueue */
+    int (*unlock)(void);        /* Function to unlock virtqueue */
     void *cookie;               /* User-defined cookie */
 
     unsigned queue_len;         /* The number of entries in rings and descriptor table */
@@ -87,11 +91,13 @@ typedef struct virtqueue_driver {
  * @param used_ring pointer to the shared used ring
  * @param desc pointer to the shared descriptor table
  * @param notify the notify function to wake up device side
+ * @param lock the lock function to lock the virtqueue
+ * @param unlock the unlock function to unlock the virtqueue
  * @param cookie user's cookie
  */
 void virtqueue_init_driver(virtqueue_driver_t *vq, unsigned queue_len, vq_vring_avail_t *avail_ring,
                            vq_vring_used_t *used_ring, vq_vring_desc_t *desc, void (*notify)(void),
-                           void *cookie);
+                           int (*lock)(void), int (*unlock)(void), void *cookie);
 
 /* Initialise a device-side virtqueue.
  * @param vq the device virtqueue
@@ -100,11 +106,13 @@ void virtqueue_init_driver(virtqueue_driver_t *vq, unsigned queue_len, vq_vring_
  * @param used_ring pointer to the shared used ring
  * @param desc pointer to the shared descriptor table
  * @param notify the notify function to wake up driver side
+ * @param lock the lock function to lock the virtqueue
+ * @param unlock the unlock function to unlock the virtqueue
  * @param cookie user's cookie
  */
 void virtqueue_init_device(virtqueue_device_t *vq, unsigned queue_len, vq_vring_avail_t *avail_ring,
                            vq_vring_used_t *used_ring, vq_vring_desc_t *desc, void (*notify)(void),
-                           void *cookie);
+                           int (*lock)(void), int (*unlock)(void), void *cookie);
 
 /* Initialise the descriptor table (create the free list) */
 void virtqueue_init_desc_table(vq_vring_desc_t *table, unsigned queue_len);

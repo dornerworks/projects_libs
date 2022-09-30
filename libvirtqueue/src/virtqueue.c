@@ -9,7 +9,7 @@
 
 void virtqueue_init_driver(virtqueue_driver_t *vq, unsigned queue_len, vq_vring_avail_t *avail_ring,
                            vq_vring_used_t *used_ring, vq_vring_desc_t *desc, void (*notify)(void),
-                           void *cookie)
+                           int (*lock)(void), int (*unlock)(void), void *cookie)
 {
     if (!IS_POWER_OF_2(queue_len)) {
         ZF_LOGE("Invalid queue_len: %d, must be a power of 2.", queue_len);
@@ -21,6 +21,8 @@ void virtqueue_init_driver(virtqueue_driver_t *vq, unsigned queue_len, vq_vring_
     vq->used_ring = used_ring;
     vq->desc_table = desc;
     vq->notify = notify;
+    vq->lock = lock;
+    vq->unlock = unlock;
     vq->cookie = cookie;
     virtqueue_init_desc_table(desc, vq->queue_len);
     virtqueue_init_avail_ring(avail_ring);
@@ -30,7 +32,7 @@ void virtqueue_init_driver(virtqueue_driver_t *vq, unsigned queue_len, vq_vring_
 
 void virtqueue_init_device(virtqueue_device_t *vq, unsigned queue_len, vq_vring_avail_t *avail_ring,
                            vq_vring_used_t *used_ring, vq_vring_desc_t *desc, void (*notify)(void),
-                           void *cookie)
+                           int (*lock)(void), int (*unlock)(void), void *cookie)
 {
     if (!IS_POWER_OF_2(queue_len)) {
         ZF_LOGE("Invalid queue_len: %d, must be a power of 2.", queue_len);
@@ -41,6 +43,8 @@ void virtqueue_init_device(virtqueue_device_t *vq, unsigned queue_len, vq_vring_
     vq->used_ring = used_ring;
     vq->desc_table = desc;
     vq->notify = notify;
+    vq->lock = lock;
+    vq->unlock = unlock;
     vq->cookie = cookie;
 }
 
